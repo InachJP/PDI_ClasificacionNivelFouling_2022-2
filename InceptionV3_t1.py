@@ -9,6 +9,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
 import matplotlib.pyplot as plt
 
+#direccion del dataset, el cual ya viene filtrado con directorios train y validation
 train_dir = 'dataset_reducida/train'
 validation_dir = 'dataset_reducida/validation'
 
@@ -23,6 +24,7 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 
 valid_datagen = ImageDataGenerator(rescale=1./255)  # no augmentation for validation set
 
+#obtenemos las imagenes del directorio y las preparamos para entrenamiento
 train_generator = train_datagen.flow_from_directory(train_dir,
                                                     batch_size=32,
                                                     class_mode='categorical',
@@ -34,9 +36,11 @@ validation_generator = valid_datagen.flow_from_directory(validation_dir,
                                                          class_mode='categorical',
                                                          target_size=(224, 224))
 
+#definimos el numero de pasos por epoca
 pasos_entrenamiento = train_generator.n//train_generator.batch_size
 pasos_validacion = validation_generator.n//validation_generator.batch_size
 
+#funcion para graficar resultados
 def plot_result(history):
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
@@ -78,6 +82,8 @@ plot_model(pre_trained_model, to_file='inception_v3_model.png', show_shapes=Fals
 last_layer = pre_trained_model.get_layer('mixed7')
 last_output = last_layer.output
 
+#probamos con target size 224 valor ha resultado obtener buenos resultados con inceptionv3
+#podriamos ocupar 80,150,299 por ejemplo
 img_width, img_height = 224, 224
 
 if K.image_data_format() == 'channels_first':
@@ -90,6 +96,7 @@ inputs = layers.Input(shape=input_shape)
 x = layers.Flatten()(last_output)
 x = layers.Dense(1024, activation='relu')(x)
 x = layers.Dropout(0.2)(x)
+#debemos recordar que tenemos 3 clases
 x = layers.Dense(3, activation='softmax')(x)
 
 model = Model(pre_trained_model.input, x)
@@ -97,7 +104,7 @@ model = Model(pre_trained_model.input, x)
 model.summary()
 plot_model(model, to_file='inception_v3_with_dense_layers_model.png', show_shapes=False, show_layer_names=True)
 
-
+#"compilamos el modelo" y comienza el entrenamiento por epocas
 model.compile(loss='categorical_crossentropy',
            optimizer=optimizers.Adam(lr=0.0005),
            metrics=['accuracy'])
@@ -108,4 +115,5 @@ H = model.fit_generator(
     validation_data = validation_generator,
     validation_steps= pasos_validacion)
 
+#graficamos los resultados
 plot_result(H)
