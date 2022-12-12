@@ -13,10 +13,35 @@ class FileChooserWindow(Gtk.Window):
         box = Gtk.Box(spacing=6)
         self.add(box)
 
-        button2 = Gtk.Button(label="Seleccinar Carpeta De Imagenes")
+        button2 = Gtk.Button(label="Seleccionar Carpeta De Imagenes")
         button2.connect("clicked", self.on_folder_clicked)
         box.add(button2)
+        button3 = Gtk.Button(label="Seleccionar Modelo")
+        button3.connect("clicked", self.on_file_clicked)
+        box.add(button3)
 
+    def on_file_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog(
+            title="Please choose a file", parent=self, action=Gtk.FileChooserAction.OPEN
+        )
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN,
+
+            Gtk.ResponseType.OK,
+        )
+
+        #self.add_filters(dialog)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("Open clicked")
+            print("File selected: " + dialog.get_filename())
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Cancel clicked")
+
+        dialog.destroy()
 
     def on_folder_clicked(self, widget):
         dialog = Gtk.FileChooserDialog(
