@@ -32,8 +32,6 @@ class FileChooserWindow(Gtk.Window):
             Gtk.ResponseType.OK,
         )
 
-        #self.add_filters(dialog)
-
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             print("Open clicked")
