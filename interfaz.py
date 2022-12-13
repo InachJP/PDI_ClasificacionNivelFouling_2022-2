@@ -6,14 +6,12 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-
 import random
 import tensorflow as tf
 from PIL import Image
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image, ImageTk
+
 
 
 
@@ -104,9 +102,10 @@ class FileChooserWindow(Gtk.Window):
         #plt.figure()
         cant = len(os.listdir(photos_dir ))
 
-        for i in range(0,50):
+        for i in range(0,10):
             rand = random.randint(0,cant)
             img = Image.open(photos_dir +"/" + dir_list[rand])
+            img = img.resize((224, 224))
             img = np.array(img)
             img = np.expand_dims(img, 0)
             retorno = clasificacion(model.predict(img)[0],dir_list[rand])
